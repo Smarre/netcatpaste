@@ -1,9 +1,7 @@
 project(netcatpaste)
 cmake_minimum_required(VERSION 2.6)
 
-if(UNIX)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} /usr/share/apps/cmake/modules)
-endif()
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
 
 find_package(Qt4 REQUIRED)
 find_package(QCA2 REQUIRED)
