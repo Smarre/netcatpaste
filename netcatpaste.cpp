@@ -36,25 +36,17 @@ void netcatpaste::newConnection() {
     if(!socket->waitForReadyRead()) {
         return;
     }
-    qint64 left_to_read;
-    int counter = 100;
+
+    QByteArray data;
+
     forever {
-        if(counter <= 0) {
+        usleep(100);
+        if(!socket->waitForReadyRead(1000)) {
             break;
         }
-        if(!socket->bytesAvailable()) {
-            counter--;
-            usleep(100);
-            continue;
-        }
-        char buffer[1024];
-        left_to_read = socket->readLine(buffer, 1024);
-        QString data = buffer;
-        string.append(data);
-        if(left_to_read <= 0) {
-            usleep(10);
-            counter--;
-        }
+
+        data = socket->readAll();
+        qDebug() << data;
     }
 
     QString file_name = createPaste(string);
