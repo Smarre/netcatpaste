@@ -53,6 +53,7 @@ void netcatpaste::newConnection() {
     //QString message = "Your paste can be found at:\n" + url + "\n";
     QString message = url + "\n";
     socket->write(message.toUtf8().data());
+    socket->flush();
     sleep(3);
     socket->close();
 }
