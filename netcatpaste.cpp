@@ -39,9 +39,10 @@ void netcatpaste::newConnection() {
     QByteArray data;
 
     forever {
-        data.append(socket->readAll());
+        QByteArray received = socket->readAll();
+        data.append(received);
 
-        if(!socket->waitForReadyRead(1000)) {
+        if(!socket->waitForReadyRead(3000)) {
             break;
         }
     }
@@ -52,6 +53,7 @@ void netcatpaste::newConnection() {
     //QString message = "Your paste can be found at:\n" + url + "\n";
     QString message = url + "\n";
     socket->write(message.toUtf8().data());
+    sleep(3);
     socket->close();
 }
 
