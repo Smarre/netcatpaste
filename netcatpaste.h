@@ -13,7 +13,7 @@ class netcatpaste : public QObject {
     private slots:
         void newConnection();
         //! returns resulted file name
-        QString createPaste(QString string);
+        QString createPaste(QByteArray byte_array);
         void checkPasteDir();
 
     private:

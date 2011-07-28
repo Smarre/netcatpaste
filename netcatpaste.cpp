@@ -32,7 +32,6 @@ void netcatpaste::newConnection() {
     qDebug()<<"New connection...";
     QTcpSocket *socket = server.nextPendingConnection();
     QByteArray array;
-    QString string;
     if(!socket->waitForReadyRead()) {
         return;
     }
@@ -45,11 +44,10 @@ void netcatpaste::newConnection() {
             break;
         }
 
-        data = socket->readAll();
-        qDebug() << data;
+        data.append(socket->readAll());
     }
 
-    QString file_name = createPaste(string);
+    QString file_name = createPaste(data);
 
     QString url = paste_site + "/" + file_name;
     //QString message = "Your paste can be found at:\n" + url + "\n";
@@ -58,9 +56,8 @@ void netcatpaste::newConnection() {
     socket->close();
 }
 
-QString netcatpaste::createPaste(QString string) {
+QString netcatpaste::createPaste(QByteArray byte_array) {
     QCA::Hash hash = QCA::Hash("sha1");
-    QByteArray byte_array(string.toUtf8());
     QCA::SecureArray secure_array(byte_array);
     hash.update(secure_array);
     QCA::SecureArray result_array = hash.final();
@@ -72,7 +69,7 @@ QString netcatpaste::createPaste(QString string) {
         qDebug() << "Weren’t able to open file" << file_name;
     }
     QTextStream out(&file);
-    out << string;
+    out << byte_array;
     return result_string;
 }
 
