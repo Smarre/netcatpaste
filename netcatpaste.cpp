@@ -39,12 +39,11 @@ void netcatpaste::newConnection() {
     QByteArray data;
 
     forever {
-        usleep(100);
+        data.append(socket->readAll());
+
         if(!socket->waitForReadyRead(1000)) {
             break;
         }
-
-        data.append(socket->readAll());
     }
 
     QString file_name = createPaste(data);
