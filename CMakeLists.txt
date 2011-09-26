@@ -15,7 +15,7 @@ endif()
 
 include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
 
-set(netcatpaste_SRCS netcatpaste.cpp main.cpp)
+set(netcatpaste_SRCS netcatclient.cpp netcatpaste.cpp main.cpp)
 qt4_automoc(${netcatpaste_SRCS})
 add_executable(netcatpaste ${netcatpaste_SRCS})
 target_link_libraries(netcatpaste ${QT_QTCORE_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QCA2_LIBRARIES})

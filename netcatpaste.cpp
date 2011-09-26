@@ -7,6 +7,7 @@
 #include <QUuid>
 
 #include "netcatpaste.h"
+#include "netcatclient.h"
 
 netcatpaste::netcatpaste() :
         paste_dir("paste"),
@@ -29,33 +30,24 @@ void netcatpaste::checkPasteDir() {
 
 
 void netcatpaste::newConnection() {
-    qDebug()<<"New connection...";
     QTcpSocket *socket = server.nextPendingConnection();
-    QByteArray array;
-    if(!socket->waitForReadyRead()) {
+    qDebug()<<"New connection from " << socket->peerAddress().toString() << ":" << int(socket->peerPort());
+    if(socket == NULL)
+        return;
+
+    netcatclientthread *clientthread = new netcatclientthread(this, socket);
+    if(clientthread == NULL) {
+        socket->close();
         return;
     }
+    // FIXME: Locking!
+    clientthread_list.append(clientthread);
+    clientthread->start();
+}
 
-    QByteArray data;
-
-    forever {
-        QByteArray received = socket->readAll();
-        data.append(received);
-
-        if(!socket->waitForReadyRead(3000)) {
-            break;
-        }
-    }
-
-    QString file_name = createPaste(data);
-
-    QString url = paste_site + "/" + file_name;
-    //QString message = "Your paste can be found at:\n" + url + "\n";
-    QString message = url + "\n";
-    socket->write(message.toUtf8().data());
-    socket->flush();
-    sleep(3);
-    socket->close();
+void netcatpaste::clientthreadTerminate(netcatclientthread *clientthread) {
+    // FIXME: Locking!
+    clientthread_list.removeAll(clientthread);
 }
 
 QString netcatpaste::createPaste(QByteArray byte_array) {
@@ -75,6 +67,9 @@ QString netcatpaste::createPaste(QByteArray byte_array) {
     return result_string;
 }
 
+QString netcatpaste::buildUrl(const QString &file_name) {
+     return paste_site + "/" + file_name;
+}
 
 netcatpaste::~netcatpaste() {
     //nya
