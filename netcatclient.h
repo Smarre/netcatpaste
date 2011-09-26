@@ -31,7 +31,8 @@ class netcatclient : public QObject {
         QByteArray data;
 };
 
-class netcatclientthread : public netcatclient, public QThread {
+class netcatclientthread : public QThread, public netcatclient {
+
     public:
         netcatclientthread(netcatpaste *server, QTcpSocket *socket) : netcatclient(server, socket) { }
         void run();

@@ -23,11 +23,14 @@ netcatpaste::netcatpaste() :
     connect(&server, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 
+netcatpaste::~netcatpaste() {
+    //nya
+}
+
 void netcatpaste::checkPasteDir() {
     QDir dir(".");
     dir.mkdir(paste_dir);
 }
-
 
 void netcatpaste::newConnection() {
     QTcpSocket *socket = server.nextPendingConnection();
@@ -40,6 +43,7 @@ void netcatpaste::newConnection() {
         socket->close();
         return;
     }
+
     // FIXME: Locking!
     clientthread_list.append(clientthread);
     clientthread->start();
@@ -59,9 +63,11 @@ QString netcatpaste::createPaste(QByteArray byte_array) {
     hash.clear();
     QString file_name = paste_dir + "/" + result_string;
     QFile file(file_name);
+
     if(!file.open(QFile::WriteOnly)) {
         qDebug() << "Weren’t able to open file" << file_name;
     }
+
     QTextStream out(&file);
     out << byte_array;
     return result_string;
@@ -69,10 +75,6 @@ QString netcatpaste::createPaste(QByteArray byte_array) {
 
 QString netcatpaste::buildUrl(const QString &file_name) {
      return paste_site + "/" + file_name;
-}
-
-netcatpaste::~netcatpaste() {
-    //nya
 }
 
 #include "netcatpaste.moc"

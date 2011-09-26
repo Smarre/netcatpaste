@@ -4,7 +4,7 @@
 #include <QTcpServer>
 #include <QList>
 
-class netcatclientthread;	// fwd decl
+class netcatclientthread;
 
 class netcatpaste : public QObject {
     Q_OBJECT
@@ -14,9 +14,12 @@ class netcatpaste : public QObject {
         virtual ~netcatpaste();
 
         void clientthreadTerminate(netcatclientthread *clientthread);
+
         //! returns resulted file name
         QString createPaste(QByteArray byte_array);
+
         QString buildUrl(const QString &file_name);
+
         void checkPasteDir();
 
     private slots:
