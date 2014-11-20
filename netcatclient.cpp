@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QtCrypto>
 #include <QUuid>
+#include <QDebug>
 
 #include "netcatclient.h"
 #include "netcatpaste.h"
@@ -18,6 +19,7 @@ netcatclient::netcatclient(netcatpaste *server, QTcpSocket *socket) :
         socket(socket) {
 
     Q_ASSERT(socket);
+
     int fd = socket->socketDescriptor();
     fd_dupe = dup(fd);
 
@@ -27,19 +29,11 @@ netcatclient::netcatclient(netcatpaste *server, QTcpSocket *socket) :
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, SIGNAL(readChannelFinished()), this, SLOT(readChannelFinished()));
-    connect(socket, SIGNAL(aboutToClose()), this, SLOT(aboutToClose()));
 
 }
-
-void netcatclient::aboutToClose() {
-    fprintf(stdout, "netcatclient::aboutToClose()\n");
-    fflush(stdout);
-}
-
 
 void netcatclient::readyRead() {
-    fprintf(stdout, "netcatclient::readyRead()\n");
-    fflush(stdout);
+    qDebug() << "netcatclient::readyRead()";
 
     if(!socket->atEnd()) {
         while(true) {
@@ -47,33 +41,37 @@ void netcatclient::readyRead() {
             if(received.isNull()) {
                 break;
             }
-            fprintf(stdout, "netcatclient::readyRead() got=%d\n", received.length());
+            qDebug() << "netcatclient::readyRead() got " << received.length();
             data.append(received);
         }
 
-        fprintf(stdout, "netcatclient::readyRead() DONE\n");
+        qDebug() << "netcatclient::readyRead() DONE";
     } else {
-        fprintf(stdout, "netcatclient::readyRead() ATEND\n");
-        fflush(stdout);
+        qDebug() << "netcatclient::readyRead() ATEND";
     }
 }
 
 void netcatclient::readChannelFinished() {
-    fprintf(stdout, "netcatclient::readChannelFinished()\n");
-    fflush(stdout);
+    qDebug() << "netcatclient::readChannelFinished()";
     if(fd_dupe >= 0) {
         shutdown(fd_dupe, SHUT_RD);
     }
 
     QString file_name = server->createPaste(data);
     QString url = server->buildUrl(file_name);
-    //QString message = "Your paste can be found at:\n" + url + "\n";
-    QString message = url + "\n";
+    QString message = "Your paste can be found at:\n" + url + "\n";
+    //QString message = url + "\n";
+
+    sleep(5);
 
     if(fd_dupe >= 0) {
-        //socket->write(message.toUtf8().data()); // broken Qt socket shutdown() handling
-        //socket->flush();
-        //socket->close();
+
+        /*
+        socket->write(message.toUtf8()); // broken Qt socket shutdown() handling (so it says, leaving for future reference until it’s tested)
+        socket->waitForBytesWritten();
+        socket->close();
+        */
+
         QByteArray ba = message.toUtf8();
         int len = ba.length();
         const void *data = ba.data();
@@ -85,8 +83,7 @@ void netcatclient::readChannelFinished() {
 }
 
 void netcatclient::close() {
-fprintf(stdout, "netcatclient::close()\n");
-fflush(stdout);
+    qDebug() << "netcatclient::close()";
     if(fd_dupe >= 0) {
         ::close(fd_dupe);
         fd_dupe = -1;
@@ -94,7 +91,7 @@ fflush(stdout);
     if(socket != NULL) {
         socket->close();
         //delete socket;
-        socket = NULL;
+        //socket = NULL;
     }
 }
 

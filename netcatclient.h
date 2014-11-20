@@ -19,7 +19,6 @@ class netcatclient : public QObject {
     private slots:
         void readyRead();
         void readChannelFinished();
-        void aboutToClose();
 
     protected:
         netcatpaste *server;
@@ -27,6 +26,13 @@ class netcatclient : public QObject {
     private:
         void close();
 
+        /**
+         * We need to duplicate the socket, as QTcpSocket does not support TCP half-close.
+         *
+         * When data is send to netcatpaste, after EOF of the data, the client closes the connection,
+         * but keeps receiving stream still open. QTcpSocket can’t recognize that the stream is still
+         * open, hence refuses to send data to the server.
+         */
         int fd_dupe;
         QTcpSocket *socket;
         QByteArray data;
