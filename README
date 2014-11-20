@@ -1,0 +1,26 @@
+=== netcatpaste ===
+
+This is simple utility to paste blobs of text over netcat. This version is currently tailored for BSD type
+of netcat, which requires TCP half-close in order to terminate the connection.
+
+netcat6 can be used with --half-close argument, for example
+
+    cat | paste.service.fi 1234 --half-close
+    inputtext
+    ^D
+
+GNU netcat (http://netcat.sourceforge.net/), as far as I know, does not support TCP half-close, so supporting that
+netcat would require timeout-based connection shutting, which was the original way I implemented this.
+Since one daemon can’t support both, I guess having one version running on other port and one on other would be possible,
+though that will make it more complex for users.
+
+There is no particular daemon support for the project at the moment, just running the program would suffice. At the moment
+paste saving directory is hardcoded to ./paste, that is, the netcatpaste will create a directory called “paste” in the directory
+the client was ran from.
+
+Pastes can be made accessable for example by putting Nginx to point to the paste directory, serving the files from there.
+
+Contributions are welcome :) The project is maintained through my Gerrit instance, at http://gerrit.smar.fi/#/q/project:netcatpaste,
+but I will process Github pull requests too, by pushing the to the repo myself. Github repository is official clone of the project.
+
+Project is licensed under ISC license.
