@@ -3,6 +3,7 @@
 
 #include <QTcpSocket>
 #include <QByteArray>
+#include <QThread>
 
 #include "netcatpaste.h"
 
