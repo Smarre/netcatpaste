@@ -62,8 +62,6 @@ void netcatclient::readChannelFinished() {
     QString message = "Your paste can be found at:\n" + url + "\n";
     //QString message = url + "\n";
 
-    sleep(5);
-
     if(fd_dupe >= 0) {
 
         /*
